@@ -14,8 +14,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import static com.ssubijana.roleauthorization.utils.Constants.REQUEST_TOKEN_URL;
-
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(securedEnabled = true) // Habilitamos la securización de nuestra API con @Secured
@@ -52,6 +50,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.csrf().disable()
 				.authorizeRequests().antMatchers(HttpMethod.POST, "/login").permitAll()
 				.anyRequest().authenticated().and()
-				.addFilterBefore(new JwtAuthenticationFilter(authenticationManager()), UsernamePasswordAuthenticationFilter.class);
+				.addFilterBefore(new JwtAuthenticationFilter(authenticationManager()),
+						UsernamePasswordAuthenticationFilter.class);
 	}
 }
