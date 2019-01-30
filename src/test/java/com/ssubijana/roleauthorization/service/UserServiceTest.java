@@ -15,6 +15,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -24,7 +25,7 @@ public class UserServiceTest {
 
 	private static final long USER_ID = 1L;
 
-	private static final String USER_PASSWORD = "USER_PASSWORD";
+	private static final String USER_PASS = "USER_PASS";
 
 	@Mock
 	private UserRepository userRepository;
@@ -38,7 +39,7 @@ public class UserServiceTest {
 		roles.add(Role.builder().name("ROLE_ADMIN").id(1L).description("ROLE_DESC").build());
 		roles.add(Role.builder().name("ROLE_USER").id(1L).description("ROLE_DESC_USER").build());
 
-		User expectedUser = User.builder().id(USER_ID).name(USER_NAME).password(USER_PASSWORD).roles(roles).build();
+		User expectedUser = User.builder().id(USER_ID).name(USER_NAME).password(USER_PASS).roles(roles).build();
 
 		when(userRepository.findByName(USER_NAME)).thenReturn(expectedUser);
 
@@ -52,6 +53,13 @@ public class UserServiceTest {
 	@Test(expected = UsernameNotFoundException.class)
 	public void loadUserByUsernameShouldThrowExceptionIfUserIsNotFound() {
 		userService.loadUserByUsername(USER_NAME);
+	}
+
+	@Test
+	public void getUserShouldCallRepository() {
+		userService.getUser(USER_ID);
+
+		verify(userRepository).findById(USER_ID);
 	}
 
 }

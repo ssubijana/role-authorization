@@ -36,6 +36,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		return super.authenticationManagerBean();
 	}
 
+	@Bean
+	public JwtAuthorizationFilter jwtAuthorizationFilterBean() {
+		return new JwtAuthorizationFilter();
+	}
+
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 		// Configuración de la clase que recupera los usuarios y algorito para procesar las passwords
@@ -51,6 +56,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.authorizeRequests().antMatchers(HttpMethod.POST, "/login").permitAll()
 				.anyRequest().authenticated().and()
 				.addFilterBefore(new JwtAuthenticationFilter(authenticationManager()),
-						UsernamePasswordAuthenticationFilter.class);
+						UsernamePasswordAuthenticationFilter.class)
+				.addFilterBefore(jwtAuthorizationFilterBean(), UsernamePasswordAuthenticationFilter.class);
 	}
 }

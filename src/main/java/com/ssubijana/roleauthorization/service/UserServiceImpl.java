@@ -5,12 +5,11 @@ import com.ssubijana.roleauthorization.domain.User;
 import com.ssubijana.roleauthorization.mapper.UserDetailsMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service("userDetailsService")
-public class UserServiceImpl implements UserService, UserDetailsService {
+public class UserServiceImpl implements UserService {
 
 	private UserRepository userRepository;
 
@@ -29,4 +28,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 		return UserDetailsMapper.build(retrievedUser);
 	}
 
+	@Override
+	public User getUser(long id) {
+		return userRepository.findById(id);
+	}
 }

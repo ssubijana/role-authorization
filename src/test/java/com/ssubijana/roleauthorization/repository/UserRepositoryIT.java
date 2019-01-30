@@ -27,4 +27,12 @@ public class UserRepositoryIT {
 		assertThat(retrievedUser).isNotNull();
 	}
 
+	@Test
+	public void shouldGetUserById() {
+		User retrievedUser = userRepository.findById(1L);
+
+		assertThat(retrievedUser).isNotNull();
+		assertThat(retrievedUser.getName()).isEqualTo("userTest");
+	}
+
 }

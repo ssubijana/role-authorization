@@ -1,16 +1,23 @@
 package com.ssubijana.roleauthorization.utils;
 
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.stream.Collectors;
 
 import static com.ssubijana.roleauthorization.utils.Constants.*;
 
 public class TokenProvider {
+
+	private TokenProvider() {
+	}
 
 	public static String generateToken(Authentication authentication) {
 		// Genera el token con roles, issuer, fecha, expiración (8h)
@@ -27,6 +34,29 @@ public class TokenProvider {
 				.compact();
 	}
 
+	public static UsernamePasswordAuthenticationToken getAuthentication(final String token,
+			final UserDetails userDetails) {
 
+		final JwtParser jwtParser = Jwts.parser().setSigningKey(SIGNING_KEY);
+
+		final Jws<Claims> claimsJws = jwtParser.parseClaimsJws(token);
+
+		final Claims claims = claimsJws.getBody();
+
+		final Collection<SimpleGrantedAuthority> authorities =
+				Arrays.stream(claims.get(AUTHORITIES_KEY).toString().split(","))
+						.map(SimpleGrantedAuthority::new)
+						.collect(Collectors.toList());
+
+		return new UsernamePasswordAuthenticationToken(userDetails, "", authorities);
+	}
+
+	public static String getUserName(final String token) {
+		final JwtParser jwtParser = Jwts.parser().setSigningKey(SIGNING_KEY);
+
+		final Jws<Claims> claimsJws = jwtParser.parseClaimsJws(token);
+
+		return claimsJws.getBody().getSubject();
+	}
 
 }
