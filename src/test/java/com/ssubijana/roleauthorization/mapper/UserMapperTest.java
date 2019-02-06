@@ -1,6 +1,7 @@
 package com.ssubijana.roleauthorization.mapper;
 
 import com.ssubijana.roleauthorization.domain.User;
+import com.ssubijana.roleauthorization.web.presentation.AuthorizationRequest;
 import com.ssubijana.roleauthorization.web.presentation.UserResponse;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,6 +24,18 @@ public class UserMapperTest {
 
 		assertThat(userResponse.getId()).isEqualTo(user.getId());
 		assertThat(userResponse.getName()).isEqualTo(user.getName());
+
+	}
+
+	@Test
+	public void toDomainShouldReturnValidUser() {
+		AuthorizationRequest authorizationRequest = AuthorizationRequest.builder().userName(USER_NAME)
+				.password("USER_PASSWORD").build();
+
+		User user = UserMapper.toDomain(authorizationRequest);
+
+		assertThat(user.getName()).isEqualTo(authorizationRequest.getUserName());
+		assertThat(user.getPassword()).isEqualTo(authorizationRequest.getPassword());
 
 	}
 

@@ -51,13 +51,26 @@ public class AuthorizationIT {
 
 	@Test
 	public void shouldAuthorizeAdminUserToGetUserInfo() throws Exception {
-		AuthorizationRequest request = AuthorizationRequest.builder().userName("userTest").password("password1")
+		String token = getToken("userTest", "password1");
+
+		mockMvc.perform(
+				get("/users/1").header(Constants.HEADER_AUTHORIZATION_KEY, token))
+				.andDo(print()).andExpect(status().isOk()).andReturn();
+	}
+
+	private String getToken(String userTest, String password1) throws Exception {
+		AuthorizationRequest request = AuthorizationRequest.builder().userName(userTest).password(password1)
 				.build();
 		final MvcResult mvcResult = mockMvc.perform(
 				post("/login").contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(request)))
 				.andDo(print()).andExpect(status().isOk()).andReturn();
 
-		String token = mvcResult.getResponse().getHeader(Constants.HEADER_AUTHORIZATION_KEY);
+		return mvcResult.getResponse().getHeader(Constants.HEADER_AUTHORIZATION_KEY);
+	}
+
+	@Test
+	public void shouldAuthorizeUserToGetUserInfo() throws Exception {
+		String token = getToken("userTest_2", "password2");
 
 		mockMvc.perform(
 				get("/users/1").header(Constants.HEADER_AUTHORIZATION_KEY, token))
@@ -65,17 +78,36 @@ public class AuthorizationIT {
 	}
 
 	@Test
-	public void shouldNotAuthorizeUserToGetUserInfo() throws Exception {
-		AuthorizationRequest request = AuthorizationRequest.builder().userName("userTest_2").password("password2")
-				.build();
-		final MvcResult mvcResult = mockMvc.perform(
-				post("/login").contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(request)))
-				.andDo(print()).andExpect(status().isOk()).andReturn();
-
-		String token = mvcResult.getResponse().getHeader(Constants.HEADER_AUTHORIZATION_KEY);
+	public void shouldNotAuthorizeOperationalUserToGetUserInfo() throws Exception {
+		String token = getToken("userTest_3", "password2");
 
 		mockMvc.perform(
 				get("/users/1").header(Constants.HEADER_AUTHORIZATION_KEY, token))
 				.andDo(print()).andExpect(status().isForbidden()).andReturn();
 	}
+
+	@Test
+	public void shouldAuthorizeAdminUserToSave() throws Exception {
+		String token = getToken("userTest", "password1");
+
+		AuthorizationRequest request = AuthorizationRequest.builder().userName("userTest_4").password("password4")
+				.build();
+		mockMvc.perform(
+				post("/users").header(Constants.HEADER_AUTHORIZATION_KEY, token).contentType(MediaType.APPLICATION_JSON)
+						.content(mapper.writeValueAsString(request)))
+				.andDo(print()).andExpect(status().isOk());
+	}
+
+	@Test
+	public void shouldNotAuthorizeOperationalUserToSave() throws Exception {
+		String token = getToken("userTest_3", "password2");
+
+		AuthorizationRequest request = AuthorizationRequest.builder().userName("userTest_4").password("password4")
+				.build();
+		mockMvc.perform(
+				post("/users").header(Constants.HEADER_AUTHORIZATION_KEY, token).contentType(MediaType.APPLICATION_JSON)
+						.content(mapper.writeValueAsString(request)))
+				.andDo(print()).andExpect(status().isForbidden()).andReturn();
+	}
+
 }

@@ -1,15 +1,16 @@
 package com.ssubijana.roleauthorization.service;
 
-import com.ssubijana.roleauthorization.UserRepository;
 import com.ssubijana.roleauthorization.domain.Role;
 import com.ssubijana.roleauthorization.domain.User;
+import com.ssubijana.roleauthorization.repository.RoleRepository;
+import com.ssubijana.roleauthorization.repository.UserRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -18,7 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@RunWith(SpringJUnit4ClassRunner.class)
+@RunWith(SpringRunner.class)
 public class UserServiceTest {
 
 	private static final String USER_NAME = "USER_NAME";
@@ -29,6 +30,9 @@ public class UserServiceTest {
 
 	@Mock
 	private UserRepository userRepository;
+
+	@Mock
+	private RoleRepository roleRepository;
 
 	@InjectMocks
 	private UserServiceImpl userService;
@@ -60,6 +64,23 @@ public class UserServiceTest {
 		userService.getUser(USER_ID);
 
 		verify(userRepository).findById(USER_ID);
+	}
+
+	@Test
+	public void saveUserShouldSaveUserWithUserRole() {
+		final User userToSave = User.builder().name(USER_NAME).password(USER_PASS).build();
+		final Role userRole = Role.builder().name("ROLE_USER").id(1L).description("ROLE_USER").build();
+
+		Set<Role> roles = new HashSet<>();
+		roles.add(userRole);
+		User encryptedUser = User.builder().name(USER_NAME).password(USER_PASS).roles(roles).build();
+
+		when(roleRepository.findByName("USER")).thenReturn(userRole);
+		when(userRepository.save(encryptedUser)).thenReturn(encryptedUser);
+
+		final User savedUser = userService.save(userToSave);
+
+		assertThat(savedUser).isEqualTo(encryptedUser);
 	}
 
 }
