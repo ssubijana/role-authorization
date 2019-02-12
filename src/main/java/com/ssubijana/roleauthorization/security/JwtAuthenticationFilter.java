@@ -3,7 +3,6 @@ package com.ssubijana.roleauthorization.security;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssubijana.roleauthorization.utils.TokenProvider;
 import com.ssubijana.roleauthorization.web.presentation.AuthorizationRequest;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -25,7 +24,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
 	public JwtAuthenticationFilter(AuthenticationManager authenticationManager) {
 		this.authenticationManager = authenticationManager;
-		super.setAuthenticationFailureHandler(new JwtAuthenticationFailureHandler(HttpStatus.FORBIDDEN));
+		super.setAuthenticationFailureHandler(new JwtAuthenticationFailureHandler());
 	}
 
 	@Override

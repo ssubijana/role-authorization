@@ -46,7 +46,7 @@ public class AuthorizationIT {
 				.build();
 		mockMvc.perform(
 				post("/login").contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(request)))
-				.andDo(print()).andExpect(status().isForbidden());
+				.andDo(print()).andExpect(status().isUnauthorized());
 	}
 
 	@Test

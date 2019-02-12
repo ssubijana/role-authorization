@@ -46,7 +46,7 @@ public class UserRepositoryIT {
 	public void shouldGetAllUsers() {
 		final List<User> users = userRepository.findAll();
 
-		assertThat(users).hasSize(2);
+		assertThat(users).hasSize(3);
 	}
 
 	@Test

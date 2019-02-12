@@ -18,6 +18,10 @@ public class JwtAuthenticationFailureHandler implements AuthenticationFailureHan
 		this.statusErrorResponse = statusErrorResponse;
 	}
 
+	public JwtAuthenticationFailureHandler() {
+		this.statusErrorResponse = HttpStatus.UNAUTHORIZED;
+	}
+
 	@Override
 	public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
 			AuthenticationException e) throws IOException, ServletException {
